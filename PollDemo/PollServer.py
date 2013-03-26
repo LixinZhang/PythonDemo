@@ -4,30 +4,40 @@ The poll function provides similar features to select() , but the underlying imp
 But poll() is not supported under windows .
 @author: xiaojay
 '''
+
 import socket
 import select 
 import Queue
+
+
 
 # Create a TCP/IP socket, and then bind and listen
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.setblocking(False)
 server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+
 server_address = ("192.168.1.102", 10001)
 
 print  "Starting up on %s port %s" % server_address
 server.bind(server_address)
+
 server.listen(5)
 message_queues = {}
+
 #The timeout value is represented in milliseconds, instead of seconds.
 timeout = 1000
+
 # Create a limit for the event
 READ_ONLY = ( select.POLLIN | select.POLLPRI | select.POLLHUP | select.POLLERR)
 READ_WRITE = (READ_ONLY|select.POLLOUT)
+
 # Set up the poller
 poller = select.poll()
 poller.register(server,READ_ONLY)
+
 #Map file descriptors to socket objects
 fd_to_socket = {server.fileno():server,}
+
 while True:
     print "Waiting for the next event"
     events = poller.poll(timeout)
@@ -85,3 +95,6 @@ while True:
             poller.unregister(s)
             s.close()
             del message_queues[s]
+
+
+
